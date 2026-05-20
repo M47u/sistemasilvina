@@ -94,7 +94,10 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('casos.show', $caso) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ route('casos.pdf.caso', $caso) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir PDF" target="_blank">
+                                <i class="bi bi-printer"></i>
+                            </a>
+                            <a href="{{ route('casos.show', $caso) }}" class="btn btn-sm btn-outline-primary" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </td>
