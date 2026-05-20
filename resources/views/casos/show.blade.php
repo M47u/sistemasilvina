@@ -12,6 +12,9 @@
         @endif
     </h4>
     <div class="d-flex gap-2">
+        <a href="{{ route('casos.pdf.caso', $caso) }}" class="btn btn-outline-danger btn-sm" target="_blank">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar PDF
+        </a>
         <a href="{{ route('casos.edit', $caso) }}" class="btn btn-warning btn-sm">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>

@@ -84,6 +84,14 @@ class CasoController extends Controller
         return redirect()->route('casos.index')->with('success', 'Caso eliminado.');
     }
 
+    public function pdfCaso(Caso $caso)
+    {
+        $caso->load(['tipoExpediente', 'localidad']);
+        $pdf = Pdf::loadView('casos.pdf_caso', compact('caso'))->setPaper('a4', 'portrait');
+        $nombre = 'caso-' . str_replace('/', '-', $caso->nro_legajo) . '.pdf';
+        return $pdf->download($nombre);
+    }
+
     public function exportExcel()
     {
         return Excel::download(new CasosExport, 'casos-' . now()->format('Y-m-d') . '.xlsx');

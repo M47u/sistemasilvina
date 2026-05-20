@@ -11,8 +11,9 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/casos/export/excel', [CasoController::class, 'exportExcel'])->name('casos.export.excel');
-    Route::get('/casos/export/pdf',   [CasoController::class, 'exportPdf'])->name('casos.export.pdf');
+    Route::get('/casos/export/excel',  [CasoController::class, 'exportExcel'])->name('casos.export.excel');
+    Route::get('/casos/export/pdf',    [CasoController::class, 'exportPdf'])->name('casos.export.pdf');
+    Route::get('/casos/{caso}/pdf',    [CasoController::class, 'pdfCaso'])->name('casos.pdf.caso');
     Route::resource('casos', CasoController::class);
 
     Route::resource('localidades', LocalidadController::class)
