@@ -60,7 +60,9 @@
 
     {{-- Membrete --}}
     <div class="membrete">
-        <img src="{{ public_path('img/membrete.png') }}" alt="Membrete">
+        @if($membrete)
+            <img src="{{ $membrete }}" alt="Membrete">
+        @endif
         <hr class="membrete-linea">
     </div>
 

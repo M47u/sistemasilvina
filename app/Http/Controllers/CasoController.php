@@ -87,7 +87,15 @@ class CasoController extends Controller
     public function pdfCaso(Caso $caso)
     {
         $caso->load(['tipoExpediente', 'localidad']);
-        $pdf = Pdf::loadView('casos.pdf_caso', compact('caso'))->setPaper('a4', 'portrait');
+
+        $posiblesMembrete = [
+            base_path('public/img/membrete.png'),
+            base_path('../public_html/img/membrete.png'),
+            base_path('../public/img/membrete.png'),
+        ];
+        $membrete = collect($posiblesMembrete)->first(fn($p) => file_exists($p));
+
+        $pdf = Pdf::loadView('casos.pdf_caso', compact('caso', 'membrete'))->setPaper('a4', 'portrait');
         $nombre = 'caso-' . str_replace('/', '-', $caso->nro_legajo) . '.pdf';
         return $pdf->download($nombre);
     }
