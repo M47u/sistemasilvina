@@ -15,7 +15,7 @@
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
-                     style="width:56px;height:56px;background:#e8f4fd;">
+                     style="width:56px;height:56px;background:#eaf4fb;">
                     <i class="bi bi-folder2-open fs-4 text-primary"></i>
                 </div>
                 <div>
@@ -57,9 +57,9 @@
 
 {{-- Últimos casos --}}
 <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-        <span class="fw-semibold">Últimos casos registrados</span>
-        <a href="{{ route('casos.index') }}" class="btn btn-outline-secondary btn-sm">Ver todos</a>
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <span>Últimos casos registrados</span>
+        <a href="{{ route('casos.index') }}" class="btn btn-sm" style="color:#e8a4c8;border-color:#e8a4c8;">Ver todos</a>
     </div>
     <div class="card-body p-0">
         @if($ultimosCasos->isEmpty())

@@ -8,7 +8,7 @@
         h2 { font-size: 14px; margin-bottom: 4px; }
         p.sub { font-size: 9px; color: #666; margin-top: 0; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background-color: #1a252f; color: #fff; padding: 5px 6px; font-size: 9px; text-align: left; }
+        th { background-color: #173a5e; color: #fff; padding: 5px 6px; font-size: 9px; text-align: left; }
         td { padding: 4px 6px; border-bottom: 1px solid #e5e7eb; }
         tr:nth-child(even) td { background-color: #f9fafb; }
         .badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 8px; }
