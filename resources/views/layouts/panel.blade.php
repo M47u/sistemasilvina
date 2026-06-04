@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Inicio') — Sistema Silvina</title>
+    <title>@yield('title', 'Inicio') — SIGEM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid px-4">
         <a class="navbar-brand" href="{{ route('dashboard') }}">
-            <i class="bi bi-shield-check me-1"></i> Sistema Silvina
+            <i class="bi bi-shield-check me-1"></i> SIGEM
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
             <span class="navbar-toggler-icon"></span>

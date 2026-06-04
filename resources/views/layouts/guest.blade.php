@@ -15,8 +15,8 @@
     <div style="width: 100%; max-width: 420px;" class="px-3">
         <div class="text-center mb-4">
             <i class="bi bi-shield-check" style="font-size: 3rem; color: #fff;"></i>
-            <h4 class="text-white mt-2 fw-bold">Sistema Silvina</h4>
-            <p class="text-white-50 mb-0">Sistema de Gestión de Casos</p>
+            <h4 class="text-white mt-2 fw-bold">SIGEM</h4>
+            <p class="text-white-50 mb-0">Sistema Integral de Gestión de Expedientes de la Mujer</p>
         </div>
         <div class="card shadow border-0 rounded-3">
             <div class="card-body p-4">
