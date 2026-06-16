@@ -45,9 +45,15 @@
                     <option value="1" {{ request('archivado') === '1' ? 'selected' : '' }}>Archivados</option>
                 </select>
             </div>
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-md-1">
+                <select name="sin_fecha" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    <option value="1" {{ request('sin_fecha') === '1' ? 'selected' : '' }}>Sin fecha</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex gap-2">
                 <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                    <i class="bi bi-search"></i> Buscar
+                    <i class="bi bi-search"></i>
                 </button>
                 <a href="{{ route('casos.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x-lg"></i>
@@ -91,11 +97,22 @@
                 <tbody>
                     @forelse($casos as $caso)
                     <tr>
-                        <td class="text-muted small">{{ $caso->fecha_recepcion->format('d/m/Y') }}</td>
+                        <td class="text-muted small">
+                            @if($caso->fecha_recepcion)
+                                {{ $caso->fecha_recepcion->format('d/m/Y') }}
+                            @else
+                                <span class="badge bg-warning text-dark" title="Fecha pendiente de asignación">
+                                    <i class="bi bi-calendar-x me-1"></i>Sin fecha
+                                </span>
+                            @endif
+                            @if($caso->urgente)
+                                <span class="badge bg-danger ms-1">Urgente</span>
+                            @endif
+                        </td>
                         <td><code>{{ $caso->nro_legajo }}</code></td>
-                        <td>{{ $caso->apellido_nombre }}</td>
-                        <td class="text-muted">{{ $caso->dni }}</td>
-                        <td>{{ $caso->localidad->nombre }}</td>
+                        <td>{{ $caso->persona?->apellido_nombre ?? $caso->apellido_nombre }}</td>
+                        <td class="text-muted">{{ $caso->persona?->dni ?? $caso->dni }}</td>
+                        <td>{{ $caso->persona?->localidad?->nombre ?? $caso->localidad?->nombre }}</td>
                         <td><span class="badge bg-secondary badge-servicio">{{ $caso->tipoExpediente->nombre }}</span></td>
                         <td>
                             @if($caso->servicio_legal)
