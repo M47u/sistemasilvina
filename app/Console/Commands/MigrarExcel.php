@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Caso;
+use App\Models\Expediente;
 use App\Models\Localidad;
 use App\Models\Persona;
 use App\Models\TipoExpediente;
@@ -108,7 +108,7 @@ class MigrarExcel extends Command
             }
 
             // Legajo duplicado → warning pero migrar igual
-            if (!$dryRun && Caso::where('nro_legajo', $legajo)->exists()) {
+            if (!$dryRun && Persona::where('nro_legajo', $legajo)->exists()) {
                 $this->warnings[] = "Fila $row: legajo $legajo ya existe en la base de datos — omitida";
                 $stats['filas_saltadas']++;
                 continue;
@@ -126,6 +126,7 @@ class MigrarExcel extends Command
                 );
 
                 $datosPersona = [
+                    'nro_legajo'      => $legajo,
                     'apellido_nombre' => $nombre,
                     'localidad_id'    => $localidad?->id,
                 ];
@@ -182,12 +183,11 @@ class MigrarExcel extends Command
                 $bRaw   = strtoupper(trim($sheet->getCell("B$row")->getFormattedValue()));
                 $urgente = str_contains($bRaw, 'URGENTE');
 
-                // ── Crear caso ────────────────────────────────────────────
+                // ── Crear expediente ──────────────────────────────────────
                 if (!$dryRun) {
-                    $caso = Caso::create([
+                    $expediente = Expediente::create([
                         'persona_id'           => $persona->id,
                         'fecha_recepcion'      => $fecha,
-                        'nro_legajo'           => $legajo,
                         'nro_expediente'       => $nroExp ?: null,
                         'tipo_expediente_id'   => $tipoId,
                         'via_acceso'           => $via,
@@ -201,20 +201,18 @@ class MigrarExcel extends Command
                     $stats['casos_creados']++;
 
                     // ── Profesionales pendientes (para reporte) ───────────
-                    $this->registrarProfesionalPendiente($caso->id, $legajo, 'legal',
+                    $this->registrarProfesionalPendiente($expediente->id, $legajo, 'legal',
                         trim($sheet->getCell("K$row")->getFormattedValue()));
-                    $this->registrarProfesionalPendiente($caso->id, $legajo, 'psicologia',
+                    $this->registrarProfesionalPendiente($expediente->id, $legajo, 'psicologia',
                         trim($sheet->getCell("L$row")->getFormattedValue()));
-                    $this->registrarProfesionalPendiente($caso->id, $legajo, 'social',
+                    $this->registrarProfesionalPendiente($expediente->id, $legajo, 'social',
                         trim($sheet->getCell("M$row")->getFormattedValue()));
 
-                    // ── Casos vinculados (columnas N en adelante) ─────────
+                    // ── Expedientes vinculados (columnas N en adelante) ───
                     $stubs = $this->extraerStubs($sheet, $row, $maxCol);
                     foreach ($stubs as $refExp) {
-                        Caso::create([
+                        Expediente::create([
                             'persona_id'         => $persona->id,
-                            'fecha_recepcion'    => now()->toDateString(),
-                            'nro_legajo'         => 'STUB-' . $caso->id . '-' . uniqid(),
                             'nro_expediente'     => $refExp,
                             'tipo_expediente_id' => $tipoId,
                             'urgente'            => false,

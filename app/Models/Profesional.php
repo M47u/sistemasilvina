@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Profesional extends Model
 {
+    protected $table = 'profesionales';
+
     protected $fillable = [
         'user_id',
         'apellido',
@@ -25,16 +27,16 @@ class Profesional extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function casos(): BelongsToMany
+    public function expedientes(): BelongsToMany
     {
-        return $this->belongsToMany(Caso::class, 'caso_profesional')
+        return $this->belongsToMany(Expediente::class, 'expediente_profesional')
             ->withPivot(['area', 'fecha_asignacion', 'fecha_fin', 'asignado_por'])
             ->withTimestamps();
     }
 
-    public function casosActivos(): BelongsToMany
+    public function expedientesActivos(): BelongsToMany
     {
-        return $this->casos()->wherePivotNull('fecha_fin');
+        return $this->expedientes()->wherePivotNull('fecha_fin');
     }
 
     public function getNombreCompletoAttribute(): string

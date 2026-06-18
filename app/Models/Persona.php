@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Persona extends Model
 {
     protected $fillable = [
+        'nro_legajo',
         'apellido_nombre',
         'dni',
         'localidad_id',
@@ -22,8 +23,8 @@ class Persona extends Model
         return $this->belongsTo(Localidad::class);
     }
 
-    public function casos(): HasMany
+    public function expedientes(): HasMany
     {
-        return $this->hasMany(Caso::class);
+        return $this->hasMany(Expediente::class);
     }
 }

@@ -47,7 +47,7 @@
                     <td>{{ $tipo->nombre }}</td>
                     <td class="text-end">
                         <form method="POST" action="{{ route('tipos-expediente.destroy', $tipo) }}"
-                              class="d-inline" onsubmit="return confirm('¿Eliminar {{ $tipo->nombre }}?')">
+                              class="d-inline" data-confirm="¿Eliminar el tipo de expediente {{ $tipo->nombre }}?">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>

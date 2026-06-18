@@ -17,11 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             TiposExpedienteSeeder::class,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            RolesAndPermissionsSeeder::class,
         ]);
     }
 }

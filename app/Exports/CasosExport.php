@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Caso;
+use App\Models\Expediente;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -15,8 +15,8 @@ class CasosExport implements FromQuery, WithHeadings, WithMapping, WithEvents
 {
     public function query()
     {
-        return Caso::query()
-            ->with(['tipoExpediente', 'localidad'])
+        return Expediente::query()
+            ->with(['persona.localidad', 'tipoExpediente'])
             ->orderBy('fecha_recepcion', 'desc');
     }
 
@@ -28,23 +28,23 @@ class CasosExport implements FromQuery, WithHeadings, WithMapping, WithEvents
         ];
     }
 
-    public function map($caso): array
+    public function map($expediente): array
     {
         $servicios = array_filter([
-            $caso->servicio_legal       ? 'Legal'       : null,
-            $caso->servicio_psicologico ? 'Psicológico' : null,
-            $caso->servicio_social      ? 'Social'       : null,
+            $expediente->servicio_legal       ? 'Legal'       : null,
+            $expediente->servicio_psicologico ? 'Psicológico' : null,
+            $expediente->servicio_social      ? 'Social'      : null,
         ]);
 
         return [
-            $caso->fecha_recepcion->format('d/m/Y'),
-            $caso->nro_legajo,
-            $caso->apellido_nombre,
-            $caso->dni,
-            $caso->localidad->nombre,
-            $caso->tipoExpediente->nombre,
+            $expediente->fecha_recepcion?->format('d/m/Y') ?? '—',
+            $expediente->nro_legajo ?? '—',
+            $expediente->persona?->apellido_nombre ?? $expediente->apellido_nombre ?? '—',
+            $expediente->persona?->dni ?? $expediente->dni ?? '—',
+            $expediente->persona?->localidad?->nombre ?? '—',
+            $expediente->tipoExpediente->nombre,
             implode(', ', $servicios),
-            $caso->archivado ? 'Archivado' : 'Activo',
+            $expediente->archivado ? 'Archivado' : 'Activo',
         ];
     }
 

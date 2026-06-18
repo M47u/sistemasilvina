@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Listado de Casos</title>
+    <title>Listado de Expedientes</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #333; }
         h2 { font-size: 14px; margin-bottom: 4px; }
@@ -17,8 +17,8 @@
     </style>
 </head>
 <body>
-    <h2>Sistema Silvina — Listado de Casos</h2>
-    <p class="sub">Generado el {{ now()->format('d/m/Y H:i') }} — Total: {{ $casos->count() }} casos</p>
+    <h2>Sistema Silvina — Listado de Expedientes</h2>
+    <p class="sub">Generado el {{ now()->format('d/m/Y H:i') }} — Total: {{ $expedientes->count() }} expedientes</p>
 
     <table>
         <thead>
@@ -35,22 +35,22 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($casos as $caso)
+            @foreach($expedientes as $expediente)
             <tr>
-                <td>{{ $caso->id }}</td>
-                <td>{{ $caso->fecha_recepcion->format('d/m/Y') }}</td>
-                <td>{{ $caso->nro_legajo }}</td>
-                <td>{{ $caso->apellido_nombre }}</td>
-                <td>{{ $caso->dni }}</td>
-                <td>{{ $caso->localidad->nombre }}</td>
-                <td>{{ $caso->tipoExpediente->nombre }}</td>
+                <td>{{ $expediente->id }}</td>
+                <td>{{ $expediente->fecha_recepcion?->format('d/m/Y') ?? '—' }}</td>
+                <td>{{ $expediente->nro_legajo ?? '—' }}</td>
+                <td>{{ $expediente->persona?->apellido_nombre ?? $expediente->apellido_nombre }}</td>
+                <td>{{ $expediente->persona?->dni ?? $expediente->dni ?? '—' }}</td>
+                <td>{{ $expediente->persona?->localidad?->nombre ?? '—' }}</td>
+                <td>{{ $expediente->tipoExpediente->nombre }}</td>
                 <td>
-                    {{ $caso->servicio_legal ? 'Legal ' : '' }}
-                    {{ $caso->servicio_psicologico ? 'Psic. ' : '' }}
-                    {{ $caso->servicio_social ? 'Social' : '' }}
+                    {{ $expediente->servicio_legal ? 'Legal ' : '' }}
+                    {{ $expediente->servicio_psicologico ? 'Psic. ' : '' }}
+                    {{ $expediente->servicio_social ? 'Social' : '' }}
                 </td>
                 <td>
-                    @if($caso->archivado)
+                    @if($expediente->archivado)
                         <span class="badge badge-archivado">Archivado</span>
                     @else
                         <span class="badge badge-activo">Activo</span>

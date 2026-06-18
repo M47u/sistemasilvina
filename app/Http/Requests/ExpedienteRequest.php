@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CasoRequest extends FormRequest
+class ExpedienteRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -25,10 +25,14 @@ class CasoRequest extends FormRequest
 
     public function rules(): array
     {
+        $personaExistente = $this->filled('persona_id');
+
         return [
-            // Campos del caso
+            // Persona existente (paso 2a)
+            'persona_id'           => 'nullable|exists:personas,id',
+
+            // Datos del expediente
             'fecha_recepcion'      => 'nullable|date',
-            'nro_legajo'           => 'required|string|max:50',
             'nro_expediente'       => 'nullable|string|max:50',
             'tipo_expediente_id'   => 'required|exists:tipos_expediente,id',
             'via_acceso'           => 'nullable|string|max:100',
@@ -43,18 +47,19 @@ class CasoRequest extends FormRequest
             'observaciones'        => 'nullable|string',
             'fecha_devolucion'     => 'nullable|date',
 
-            // Datos de la persona (se usan para find-or-create)
-            'apellido_nombre'      => 'required|string|max:255',
+            // Datos de la persona (solo requeridos si no hay persona_id)
+            'nro_legajo'           => $personaExistente ? 'nullable|string|max:50'  : 'required|string|max:50',
+            'apellido_nombre'      => $personaExistente ? 'nullable|string|max:255' : 'required|string|max:255',
             'dni'                  => 'nullable|string|max:20',
             'localidad_id'         => 'nullable|exists:localidades,id',
             'barrio'               => 'nullable|string|max:255',
             'telefono'             => 'nullable|string|max:50',
             'direccion'            => 'nullable|string|max:255',
 
-            // Asignación de profesionales (opcional)
-            'profesional_legal_id'    => 'nullable|exists:profesionales,id',
-            'profesional_psico_id'    => 'nullable|exists:profesionales,id',
-            'profesional_social_id'   => 'nullable|exists:profesionales,id',
+            // Asignación de profesionales (opcional, solo en create)
+            'profesional_legal_id'  => 'nullable|exists:profesionales,id',
+            'profesional_psico_id'  => 'nullable|exists:profesionales,id',
+            'profesional_social_id' => 'nullable|exists:profesionales,id',
         ];
     }
 }

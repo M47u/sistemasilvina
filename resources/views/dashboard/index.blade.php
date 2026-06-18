@@ -4,9 +4,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0 fw-semibold">Dashboard</h4>
-    <a href="{{ route('casos.create') }}" class="btn btn-primary btn-sm">
+    @hasanyrole('Coordinadora|Administrativo')
+    <a href="{{ route('expedientes.create') }}" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg me-1"></i> Nuevo caso
     </a>
+    @endhasanyrole
 </div>
 
 {{-- Stats --}}
@@ -59,7 +61,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center py-3">
         <span>Últimos casos registrados</span>
-        <a href="{{ route('casos.index') }}" class="btn btn-sm" style="color:#e8a4c8;border-color:#e8a4c8;">Ver todos</a>
+        <a href="{{ route('expedientes.index') }}" class="btn btn-sm" style="color:#e8a4c8;border-color:#e8a4c8;">Ver todos</a>
     </div>
     <div class="card-body p-0">
         @if($ultimosCasos->isEmpty())
@@ -81,10 +83,12 @@
                 <tbody>
                     @foreach($ultimosCasos as $caso)
                     <tr>
-                        <td class="text-muted small">{{ $caso->fecha_recepcion->format('d/m/Y') }}</td>
+                        <td class="text-muted small">
+                            {{ $caso->fecha_recepcion?->format('d/m/Y') ?? '—' }}
+                        </td>
                         <td><code>{{ $caso->nro_legajo }}</code></td>
-                        <td>{{ $caso->apellido_nombre }}</td>
-                        <td>{{ $caso->localidad->nombre }}</td>
+                        <td>{{ $caso->persona?->apellido_nombre ?? $caso->apellido_nombre }}</td>
+                        <td>{{ $caso->persona?->localidad?->nombre ?? $caso->localidad?->nombre ?? '—' }}</td>
                         <td><span class="badge bg-secondary">{{ $caso->tipoExpediente->nombre }}</span></td>
                         <td>
                             @if($caso->archivado)
@@ -94,10 +98,10 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('casos.pdf.caso', $caso) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir PDF" target="_blank">
+                            <a href="{{ route('expedientes.pdf.expediente', $caso) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir PDF" target="_blank">
                                 <i class="bi bi-printer"></i>
                             </a>
-                            <a href="{{ route('casos.show', $caso) }}" class="btn btn-sm btn-outline-primary" title="Ver">
+                            <a href="{{ route('expedientes.show', $caso) }}" class="btn btn-sm btn-outline-primary" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </td>

@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Caso extends Model
+class Expediente extends Model
 {
+    protected $table = 'expedientes';
+
     protected $fillable = [
         'persona_id',
         'fecha_recepcion',
-        'nro_legajo',
         'nro_expediente',
         'tipo_expediente_id',
         'via_acceso',
@@ -26,12 +28,7 @@ class Caso extends Model
         'observaciones',
         'fecha_devolucion',
         'creado_por',
-        // Campos legacy — se mantienen durante la migración del Excel
-        'apellido_nombre',
-        'dni',
-        'localidad_id',
-        'barrio',
-        'telefono',
+        // Legacy read-only columns — display only, never write new data here
     ];
 
     protected $casts = [
@@ -44,6 +41,12 @@ class Caso extends Model
         'servicio_social'      => 'boolean',
         'archivado'            => 'boolean',
     ];
+
+    // nro_legajo lives on Persona — accessor keeps all views working transparently
+    public function getNroLegajoAttribute(): ?string
+    {
+        return $this->persona?->nro_legajo;
+    }
 
     public function persona(): BelongsTo
     {
@@ -62,7 +65,7 @@ class Caso extends Model
 
     public function profesionales(): BelongsToMany
     {
-        return $this->belongsToMany(Profesional::class, 'caso_profesional')
+        return $this->belongsToMany(Profesional::class, 'expediente_profesional')
             ->withPivot(['area', 'fecha_asignacion', 'fecha_fin', 'asignado_por'])
             ->withTimestamps();
     }
@@ -70,5 +73,10 @@ class Caso extends Model
     public function profesionalesActivos(): BelongsToMany
     {
         return $this->profesionales()->wherePivotNull('fecha_fin');
+    }
+
+    public function intervenciones(): HasMany
+    {
+        return $this->hasMany(Intervencion::class)->orderBy('fecha', 'desc')->orderBy('id', 'desc');
     }
 }
