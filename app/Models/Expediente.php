@@ -11,6 +11,9 @@ class Expediente extends Model
 {
     protected $table = 'expedientes';
 
+    // Valid estados: activo | derivado | archivado
+    public const ESTADOS = ['activo', 'derivado', 'archivado'];
+
     protected $fillable = [
         'persona_id',
         'fecha_recepcion',
@@ -25,10 +28,10 @@ class Expediente extends Model
         'servicio_psicologico',
         'servicio_social',
         'archivado',
+        'estado',
         'observaciones',
         'fecha_devolucion',
         'creado_por',
-        // Legacy read-only columns — display only, never write new data here
     ];
 
     protected $casts = [

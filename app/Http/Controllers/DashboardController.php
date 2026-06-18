@@ -13,15 +13,16 @@ class DashboardController extends Controller
         }
 
         $totalCasos      = Expediente::count();
-        $casosActivos    = Expediente::where('archivado', false)->count();
-        $casosArchivados = Expediente::where('archivado', true)->count();
+        $casosActivos    = Expediente::where('estado', 'activo')->count();
+        $casosDerivados  = Expediente::where('estado', 'derivado')->count();
+        $casosArchivados = Expediente::where('estado', 'archivado')->count();
         $ultimosCasos    = Expediente::with(['tipoExpediente', 'persona.localidad'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
         return view('dashboard.index', compact(
-            'totalCasos', 'casosActivos', 'casosArchivados', 'ultimosCasos'
+            'totalCasos', 'casosActivos', 'casosDerivados', 'casosArchivados', 'ultimosCasos'
         ));
     }
 

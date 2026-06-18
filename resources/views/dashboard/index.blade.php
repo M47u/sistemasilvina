@@ -13,7 +13,7 @@
 
 {{-- Stats --}}
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -36,21 +36,35 @@
                 </div>
                 <div>
                     <div class="fs-2 fw-bold text-success">{{ $casosActivos }}</div>
-                    <div class="text-muted small">Casos activos</div>
+                    <div class="text-muted small">Activos</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
-                     style="width:56px;height:56px;background:#fdf2e9;">
-                    <i class="bi bi-archive fs-4 text-warning"></i>
+                     style="width:56px;height:56px;background:#fff8e1;">
+                    <i class="bi bi-arrow-right-circle fs-4 text-warning"></i>
                 </div>
                 <div>
-                    <div class="fs-2 fw-bold text-warning">{{ $casosArchivados }}</div>
-                    <div class="text-muted small">Casos archivados</div>
+                    <div class="fs-2 fw-bold text-warning">{{ $casosDerivados }}</div>
+                    <div class="text-muted small">Derivados</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:56px;height:56px;background:#f5f5f5;">
+                    <i class="bi bi-archive fs-4 text-secondary"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-secondary">{{ $casosArchivados }}</div>
+                    <div class="text-muted small">Archivados</div>
                 </div>
             </div>
         </div>
@@ -91,11 +105,14 @@
                         <td>{{ $caso->persona?->localidad?->nombre ?? $caso->localidad?->nombre ?? '—' }}</td>
                         <td><span class="badge bg-secondary">{{ $caso->tipoExpediente->nombre }}</span></td>
                         <td>
-                            @if($caso->archivado)
-                                <span class="badge bg-warning text-dark">Archivado</span>
-                            @else
-                                <span class="badge bg-success">Activo</span>
-                            @endif
+                            @php
+                                $eb = match($caso->estado ?? 'activo') {
+                                    'archivado' => ['label' => 'Archivado', 'class' => 'bg-secondary'],
+                                    'derivado'  => ['label' => 'Derivado',  'class' => 'bg-warning text-dark'],
+                                    default     => ['label' => 'Activo',    'class' => 'bg-success'],
+                                };
+                            @endphp
+                            <span class="badge {{ $eb['class'] }}">{{ $eb['label'] }}</span>
                         </td>
                         <td>
                             <a href="{{ route('expedientes.pdf.expediente', $caso) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir PDF" target="_blank">

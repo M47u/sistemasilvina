@@ -20,8 +20,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/personas/{persona}/expedientes', [PersonaController::class, 'expedientes'])->name('personas.expedientes');
 
     // Accessible to all authenticated roles (including Profesional)
-    Route::get('/expedientes/{expediente}',     [ExpedienteController::class,   'show'])->name('expedientes.show');
-    Route::get('/expedientes/{expediente}/pdf', [ExpedienteController::class,   'pdfExpediente'])->name('expedientes.pdf.expediente');
+    Route::get('/expedientes/{expediente}',      [ExpedienteController::class,   'show'])->name('expedientes.show');
+    Route::get('/expedientes/{expediente}/pdf',  [ExpedienteController::class,   'pdfExpediente'])->name('expedientes.pdf.expediente');
+    Route::post('/expedientes/{expediente}/salida', [ExpedienteController::class, 'darSalida'])->name('expedientes.salida');
     Route::post('/expedientes/{expediente}/intervenciones',                      [IntervencionController::class, 'store'])->name('expedientes.intervenciones.store');
     Route::delete('/expedientes/{expediente}/intervenciones/{intervencion}',     [IntervencionController::class, 'destroy'])->name('expedientes.intervenciones.destroy');
 

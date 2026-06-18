@@ -39,10 +39,11 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <select name="archivado" class="form-select form-select-sm">
+                <select name="estado" class="form-select form-select-sm">
                     <option value="">Todos</option>
-                    <option value="0" {{ request('archivado') === '0' ? 'selected' : '' }}>Activos</option>
-                    <option value="1" {{ request('archivado') === '1' ? 'selected' : '' }}>Archivados</option>
+                    <option value="activo"    {{ request('estado') === 'activo'    ? 'selected' : '' }}>Activos</option>
+                    <option value="derivado"  {{ request('estado') === 'derivado'  ? 'selected' : '' }}>Derivados</option>
+                    <option value="archivado" {{ request('estado') === 'archivado' ? 'selected' : '' }}>Archivados</option>
                 </select>
             </div>
             <div class="col-md-1">
@@ -157,11 +158,14 @@
                             @endif
                         </td>
                         <td>
-                            @if($expediente->archivado)
-                                <span class="badge bg-warning text-dark">Archivado</span>
-                            @else
-                                <span class="badge bg-success">Activo</span>
-                            @endif
+                            @php
+                                $eb = match($expediente->estado ?? 'activo') {
+                                    'archivado' => ['label' => 'Archivado', 'class' => 'bg-secondary'],
+                                    'derivado'  => ['label' => 'Derivado',  'class' => 'bg-warning text-dark'],
+                                    default     => ['label' => 'Activo',    'class' => 'bg-success'],
+                                };
+                            @endphp
+                            <span class="badge {{ $eb['class'] }}">{{ $eb['label'] }}</span>
                         </td>
                         <td class="text-end">
                             <a href="{{ route('expedientes.pdf.expediente', $expediente) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir PDF" target="_blank">

@@ -40,8 +40,8 @@ class ExpedienteController extends Controller
             $query->whereHas('persona', fn($pq) => $pq->where('localidad_id', $request->localidad_id));
         }
 
-        if ($request->filled('archivado') && $request->archivado !== '') {
-            $query->where('archivado', $request->archivado);
+        if ($request->filled('estado') && in_array($request->estado, \App\Models\Expediente::ESTADOS)) {
+            $query->where('estado', $request->estado);
         }
 
         if ($request->filled('urgente')) {
@@ -169,7 +169,53 @@ class ExpedienteController extends Controller
 
         $profesionales = Profesional::with('user')->where('activo', true)->orderBy('apellido')->get();
 
-        return view('expedientes.show', compact('expediente', 'profesionales'));
+        $miAsignacionActiva = false;
+        if (auth()->user()->hasRole('Profesional')) {
+            $prof = auth()->user()->profesional;
+            if ($prof) {
+                $miAsignacionActiva = \DB::table('expediente_profesional')
+                    ->where('expediente_id', $expediente->id)
+                    ->where('profesional_id', $prof->id)
+                    ->whereNull('fecha_fin')
+                    ->exists();
+            }
+        }
+
+        return view('expedientes.show', compact('expediente', 'profesionales', 'miAsignacionActiva'));
+    }
+
+    public function darSalida(Request $request, Expediente $expediente)
+    {
+        abort_unless(auth()->user()->hasRole('Profesional'), 403);
+
+        $profesional = auth()->user()->profesional;
+        abort_unless($profesional, 403);
+
+        $tieneActiva = \DB::table('expediente_profesional')
+            ->where('expediente_id', $expediente->id)
+            ->where('profesional_id', $profesional->id)
+            ->whereNull('fecha_fin')
+            ->exists();
+
+        abort_unless($tieneActiva, 403, 'No tenés una asignación activa en este expediente.');
+
+        $request->validate(['accion' => 'required|in:derivar,archivar']);
+
+        \DB::table('expediente_profesional')
+            ->where('expediente_id', $expediente->id)
+            ->where('profesional_id', $profesional->id)
+            ->whereNull('fecha_fin')
+            ->update(['fecha_fin' => now()]);
+
+        if ($request->accion === 'archivar') {
+            $expediente->update(['archivado' => true, 'estado' => 'archivado']);
+            $msg = 'Expediente archivado correctamente.';
+        } else {
+            $expediente->update(['estado' => 'derivado']);
+            $msg = 'Salida registrada. El expediente queda derivado para continuar en otra área.';
+        }
+
+        return redirect()->route('mis-expedientes.index')->with('success', $msg);
     }
 
     public function edit(Expediente $expediente)
@@ -233,6 +279,10 @@ class ExpedienteController extends Controller
             'fecha_asignacion' => now(),
             'asignado_por'     => auth()->id(),
         ]);
+
+        if ($expediente->estado === 'derivado') {
+            $expediente->update(['estado' => 'activo']);
+        }
 
         return back()->with('success', 'Profesional asignado correctamente.');
     }
@@ -301,7 +351,7 @@ class ExpedienteController extends Controller
 
     private function camposExpediente(ExpedienteRequest $request): array
     {
-        return $request->only([
+        $datos = $request->only([
             'fecha_recepcion',
             'nro_expediente',
             'tipo_expediente_id',
@@ -317,6 +367,10 @@ class ExpedienteController extends Controller
             'observaciones',
             'fecha_devolucion',
         ]);
+
+        $datos['estado'] = !empty($datos['archivado']) ? 'archivado' : 'activo';
+
+        return $datos;
     }
 
     private function autoAsignarProfesionales(Expediente $expediente, Persona $persona, ?Request $request = null): int

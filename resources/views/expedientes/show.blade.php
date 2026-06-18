@@ -8,22 +8,38 @@
         @if($expediente->urgente)
             <span class="badge bg-danger ms-2">Urgente</span>
         @endif
-        @if($expediente->archivado)
-            <span class="badge bg-warning text-dark ms-1">Archivado</span>
-        @else
-            <span class="badge bg-success ms-1">Activo</span>
-        @endif
+        @php
+            $estadoBadge = match($expediente->estado) {
+                'archivado' => ['label' => 'Archivado', 'class' => 'bg-secondary'],
+                'derivado'  => ['label' => 'Derivado',  'class' => 'bg-warning text-dark'],
+                default     => ['label' => 'Activo',    'class' => 'bg-success'],
+            };
+        @endphp
+        <span class="badge {{ $estadoBadge['class'] }} ms-1">{{ $estadoBadge['label'] }}</span>
     </h4>
     <div class="d-flex gap-2">
         <a href="{{ route('expedientes.pdf.expediente', $expediente) }}" class="btn btn-outline-danger btn-sm" target="_blank">
             <i class="bi bi-file-earmark-pdf me-1"></i> PDF
         </a>
+        @hasanyrole('Coordinadora|Administrativo')
         <a href="{{ route('expedientes.edit', $expediente) }}" class="btn btn-warning btn-sm">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
+        @endhasanyrole
+        @role('Profesional')
+        @if($miAsignacionActiva)
+        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalSalida">
+            <i class="bi bi-box-arrow-right me-1"></i> Dar salida
+        </button>
+        @endif
+        <a href="{{ route('mis-expedientes.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+        @else
         <a href="{{ route('expedientes.index') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Volver
         </a>
+        @endrole
     </div>
 </div>
 
@@ -363,7 +379,8 @@
 
 </div>
 
-{{-- Eliminar --}}
+{{-- Eliminar (solo Coordinadora/Administrativo) --}}
+@hasanyrole('Coordinadora|Administrativo')
 <div class="mt-4 d-flex justify-content-end">
     <form method="POST" action="{{ route('expedientes.destroy', $expediente) }}"
           data-confirm="¿Eliminar este expediente? Esta acción no se puede deshacer.">
@@ -373,4 +390,62 @@
         </button>
     </form>
 </div>
+@endhasanyrole
+
+{{-- Modal "Dar salida" (solo Profesional con asignación activa) --}}
+@role('Profesional')
+@if($miAsignacionActiva)
+<div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white" id="modalSalidaLabel">
+                    <i class="bi bi-box-arrow-right me-2"></i>Dar salida al expediente
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ route('expedientes.salida', $expediente) }}">
+                @csrf
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">
+                        Al confirmar, tu asignación activa en este expediente se cierra. Elegí qué pasa después:
+                    </p>
+                    <div class="d-flex flex-column gap-3">
+                        <label class="card border p-3 d-flex flex-row align-items-start gap-3 cursor-pointer mb-0"
+                               style="cursor:pointer" for="accion_derivar">
+                            <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                                   name="accion" id="accion_derivar" value="derivar" required>
+                            <div>
+                                <div class="fw-semibold">
+                                    <i class="bi bi-arrow-right-circle me-1 text-warning"></i>Derivar a otra área
+                                </div>
+                                <div class="text-muted small">Mi intervención terminó. El expediente continúa y puede asignarse a otro profesional.</div>
+                            </div>
+                        </label>
+                        <label class="card border p-3 d-flex flex-row align-items-start gap-3 cursor-pointer mb-0"
+                               style="cursor:pointer" for="accion_archivar">
+                            <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                                   name="accion" id="accion_archivar" value="archivar">
+                            <div>
+                                <div class="fw-semibold">
+                                    <i class="bi bi-archive me-1 text-secondary"></i>Archivar expediente
+                                </div>
+                                <div class="text-muted small">El caso finalizó conmigo. Se archiva el expediente.</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-box-arrow-right me-1"></i>Confirmar salida
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endrole
+
 @endsection
